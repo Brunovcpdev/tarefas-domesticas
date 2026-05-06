@@ -1,0 +1,28 @@
+# Build
+bin/
+obj/
+out/
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# NuGet
+packages/
+*.nupkg
+
+# Logs
+*.log
+
+# Configurações locais
+appsettings.Development.json
+
+# Node
+node_modules/
+
+# OS
+.DS_Store
+Thumbs.db
