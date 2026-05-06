@@ -1,0 +1,60 @@
+[
+  {
+    "ContainingType": "CadastroTarefas.Controllers.TarefasController",
+    "Method": "Alterar",
+    "RelativePath": "api/Tarefas/Alterar",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "tarefa",
+        "Type": "CadastroTarefas.Models.Tarefas",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "CadastroTarefas.Controllers.TarefasController",
+    "Method": "Excluir",
+    "RelativePath": "api/Tarefas/Excluir",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "IdTarefas",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "CadastroTarefas.Controllers.TarefasController",
+    "Method": "Listar",
+    "RelativePath": "api/Tarefas/Listar",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "CadastroTarefas.Controllers.TarefasController",
+    "Method": "Salvar",
+    "RelativePath": "api/Tarefas/Salvar",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "tarefa",
+        "Type": "CadastroTarefas.Models.Tarefas",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  }
+]

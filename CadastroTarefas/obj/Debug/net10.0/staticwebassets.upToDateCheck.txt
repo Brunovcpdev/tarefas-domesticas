@@ -1,0 +1,2 @@
+wwwroot\CadastroTarefas.html
+C:\Users\Bruno\Desktop\projetos\CadastroTarefas\CadastroTarefas\wwwroot\CadastroTarefas.html

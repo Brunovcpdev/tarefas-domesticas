@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Tarefas Domésticas</title>
+    <!-- Inclua os estilos do Bootstrap -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+
+    <div class="container mt-5">
+        <h2>Cadastro de Tarefas Domésticas</h2>
+
+        <!-- Botão para abrir o modal de adição de tarefa -->
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modalTarefa" onclick="abrirModalAdicionar()">
+            Adicionar Nova Tarefa
+        </button>
+
+        <!-- Lista de tarefas existentes -->
+        <ul class="list-group mt-3" id="listaTarefas"></ul>
+            <!-- Adicione mais tarefas aqui -->
+    </div>
+
+    <!-- Modal de adição de tarefa -->
+    <div class="modal fade" id="modalTarefa" tabindex="-1" role="dialog" aria-labelledby="modalTarefaLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalTarefaLabel">Adicionar Nova Tarefa</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <input type="hidden" id="idTarefaEdicao">
+                        <div class="form-group">
+                            <label for="nomeTarefaModal">Nome da Tarefa:</label>
+                            <input type="text" class="form-control" id="nomeTarefaModal" placeholder="Digite o nome da tarefa">
+                        </div>
+                        <div class="form-group">
+                            <label for="descricaoTarefaModal">Descrição da Tarefa:</label>
+                            <textarea class="form-control" id="descricaoTarefaModal" rows="3" placeholder="Descreva a tarefa"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="dataTarefaModal">Data da Tarefa:</label>
+                            <input type="date" class="form-control" id="dataTarefaModal">
+                        </div>
+                        <div class="form-group">
+                            <label for="prioridadeTarefaModal">Prioridade:</label>
+                            <select class="form-control" id="prioridadeTarefaModal">
+                                <option value="1">Baixa</option>
+                                <option value="2">Média</option>
+                                <option value="3">Alta</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="responsavelTarefaModal">Responsável:</label>
+                            <input type="text" class="form-control" id="responsavelTarefaModal" placeholder="Digite o nome do responsável">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+                    <button type="button" class="btn btn-primary" id="btnSalvarModal" onclick="salvarTarefa()">Salvar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Inclua os scripts do Bootstrap (jQuery e Popper.js) e o Bootstrap -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <!-- JavaScript personalizado para manipulação das tarefas -->
+    <script>
+        const API_URL = "http://localhost:5144/api/Tarefas";
+
+        function limparModal() {
+            $("#idTarefaEdicao").val("");
+            $("#nomeTarefaModal").val("");
+            $("#descricaoTarefaModal").val("");
+            $("#dataTarefaModal").val("");
+            $("#prioridadeTarefaModal").val("1");
+            $("#responsavelTarefaModal").val("");
+        }
+
+        function abrirModalAdicionar() {
+            limparModal();
+            $("#modalTarefaLabel").text("Adicionar Nova Tarefa");
+            $("#btnSalvarModal").text("Adicionar Tarefa");
+        }
+
+        function abrirModalEditar(id, nome, descricao, data, prioridade, responsavel) {
+            limparModal();
+            $("#modalTarefaLabel").text("Editar Tarefa");
+            $("#btnSalvarModal").text("Salvar Alterações");
+            $("#idTarefaEdicao").val(id);
+            $("#nomeTarefaModal").val(nome);
+            $("#descricaoTarefaModal").val(descricao);
+            $("#dataTarefaModal").val(data);
+            $("#prioridadeTarefaModal").val(prioridade);
+            $("#responsavelTarefaModal").val(responsavel);
+            $("#modalTarefa").modal("show");
+        }
+
+        function escapar(str) {
+            if (!str) return "";
+            return str.replace(/'/g, "\\'").replace(/"/g, "&quot;");
+        }
+
+        function listarTarefas() {
+            $.ajax({
+                type: "GET",
+                url: API_URL + "/Listar",
+                success: function (tarefas) {
+                    $("#listaTarefas").empty();
+
+                    tarefas.forEach(function (tarefa) {
+                        const prioridade = tarefa.prioridade === 1 ? "Baixa" :
+                            tarefa.prioridade === 2 ? "Média" : "Alta";
+                        const prioridadeClass = tarefa.prioridade === 1 ? "badge-success" :
+                            tarefa.prioridade === 2 ? "badge-warning" : "badge-danger";
+
+                        const data = tarefa.dataTarefa ? tarefa.dataTarefa.split('T')[0].split('-').reverse().join('/') : '';
+
+
+                        const listItem = `
+                    <li class="list-group-item">
+                        <strong>${tarefa.nomeTarefa}</strong>
+                        <span class="text-muted ml-3">📅 ${data}</span>
+                        <span class="text-muted ml-3">👤 ${tarefa.responsavel}</span>
+                        <span class="badge ml-3 ${prioridadeClass}">⚡ ${prioridade}</span>
+                        <p class="mb-0 mt-1 text-muted">${tarefa.descricao}</p>
+                        <button class="btn btn-danger btn-sm float-right ml-1" onclick="excluirTarefa(${tarefa.idTarefa})">Excluir</button>
+                        <button class="btn btn-warning btn-sm float-right" onclick="abrirModalEditar(${tarefa.idTarefa}, '${tarefa.nomeTarefa}', '${tarefa.descricao}', '${tarefa.dataTarefa ? tarefa.dataTarefa.split('T')[0] : ''}', ${tarefa.prioridade}, '${tarefa.responsavel}')">Editar</button>
+                    </li>
+                `;
+                        $("#listaTarefas").append(listItem);
+                    });
+                },
+                error: function (xhr) {
+                    alert("Erro ao listar tarefas: " + xhr.responseText);
+                }
+            });
+        }
+        $(document).ready(function () {
+            listarTarefas();
+        });
+
+        function excluirTarefa(idTarefa) {
+            if (!confirm("Deseja realmente excluir esta tarefa?")) return;
+
+            $.ajax({
+                type: "DELETE",
+                url: API_URL + "/Excluir?IdTarefas=" + idTarefa,
+                success: function () {
+                    listarTarefas();
+                    alert("Tarefa excluída com sucesso!");
+                },
+                error: function (xhr) {
+                    alert("Erro ao excluir: " + xhr.responseText);
+                }
+            });
+        }
+
+        function salvarTarefa() {
+            const id = $("#idTarefaEdicao").val();
+            const nome = $("#nomeTarefaModal").val().trim();
+            const descricao = $("#descricaoTarefaModal").val().trim();
+            const dataStr = $("#dataTarefaModal").val();
+            const prioridade = parseInt($("#prioridadeTarefaModal").val(), 10);
+            const responsavel = $("#responsavelTarefaModal").val().trim();
+
+            if (!nome || !dataStr) {
+                alert("Por favor, preencha os campos obrigatórios: Nome e Data.");
+                return;
+            }
+
+            const tarefa = {
+                NomeTarefa: nome,
+                Descricao: descricao,
+                DataTarefa: dataStr,
+                Prioridade: prioridade,
+                Responsavel: responsavel
+            };
+
+            if (id) {
+                // ── EDITAR ────────────────────────────────────────
+                tarefa.IdTarefa = parseInt(id);
+
+                $.ajax({
+                    type: "PUT",
+                    url: API_URL + "/Alterar",
+                    contentType: "application/json",
+                    data: JSON.stringify(tarefa),
+                    success: function () {
+                        listarTarefas();
+                        $("#modalTarefa").modal("hide");
+                        alert("Tarefa alterada com sucesso!");
+                    },
+                    error: function (xhr) {
+                        alert("Erro ao alterar: " + xhr.responseText);
+                    }
+                });
+            } else {
+                // ── ADICIONAR ─────────────────────────────────────
+                $.ajax({
+                    type: "POST",
+                    url: API_URL + "/Salvar",
+                    contentType: "application/json",
+                    data: JSON.stringify(tarefa),
+                    success: function () {
+                        listarTarefas();
+                        $("#modalTarefa").modal("hide");
+                        alert("Tarefa salva com sucesso!");
+                    },
+                    error: function (xhr) {
+                        console.error("Status: " + xhr.status);
+                        console.error("Resposta: " + xhr.responseText);
+                        alert("Erro ao salvar: " + xhr.status + " - " + xhr.responseText);
+                    }
+                });
+            }
+        }
+    </script>

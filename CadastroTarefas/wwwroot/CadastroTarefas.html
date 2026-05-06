@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Tarefas Domésticas</title>
+    <!-- Inclua os estilos do Bootstrap -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+
+    <div class="container mt-5">
+        <h2>Cadastro de Tarefas Domésticas</h2>
+
+        <!-- Botão para abrir o modal de adição de tarefa -->
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modalTarefa">
+            Adicionar Nova Tarefa
+        </button>
+
+        <!-- Lista de tarefas existentes -->
+        <ul class="list-group mt-3">
+            <li class="list-group-item">
+                Tarefa 1
+                <button class="btn btn-danger float-right" onclick="excluirTarefa(this)">Excluir</button>
+            </li>
+            <li class="list-group-item">
+                Tarefa 2
+                <button class="btn btn-danger float-right" onclick="excluirTarefa(this)">Excluir</button>
+            </li>
+            <!-- Adicione mais tarefas aqui -->
+        </ul>
+    </div>
+
+    <!-- Modal de adição de tarefa -->
+    <div class="modal fade" id="modalTarefa" tabindex="-1" role="dialog" aria-labelledby="modalTarefaLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalTarefaLabel">Adicionar Nova Tarefa</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="form-group">
+                            <label for="nomeTarefaModal">Nome da Tarefa:</label>
+                            <input type="text" class="form-control" id="nomeTarefaModal" placeholder="Digite o nome da tarefa">
+                        </div>
+                        <div class="form-group">
+                            <label for="descricaoTarefaModal">Descrição da Tarefa:</label>
+                            <textarea class="form-control" id="descricaoTarefaModal" rows="3" placeholder="Descreva a tarefa"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="dataTarefaModal">Data da Tarefa:</label>
+                            <input type="date" class="form-control" id="dataTarefaModal">
+                        </div>
+                        <div class="form-group">
+                            <label for="prioridadeTarefaModal">Prioridade:</label>
+                            <select class="form-control" id="prioridadeTarefaModal">
+                                <option value="1">Baixa</option>
+                                <option value="2">Média</option>
+                                <option value="3">Alta</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="responsavelTarefaModal">Responsável:</label>
+                            <input type="text" class="form-control" id="responsavelTarefaModal" placeholder="Digite o nome do responsável">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+                    <button type="button" class="btn btn-primary" onclick="adicionarTarefa()">Adicionar Tarefa</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Inclua os scripts do Bootstrap (jQuery e Popper.js) e o Bootstrap -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <!-- JavaScript personalizado para manipulação das tarefas -->
+    <script>
+        function excluirTarefa(button) {
+            $(button).parent().remove();
+        }
+
+        function adicionarTarefa() {
+            const nome = $("#nomeTarefaModal").val();
+            const descricao = $("#descricaoTarefaModal").val();
+            const dataString = $("#dataTarefaModal").val();
+            const prioridade = parseInt($("#prioridadeTarefaModal").val(), 10);
+            const responsavel = $("#responsavelTarefaModal").val();
+
+            if (!nome || !dataString || !prioridade) {
+                alert("Por favor, preencha todos os campos obrigatórios.");
+                return;
+            }
+
+            const dataParts = dataString.split('-');
+            const dataFormatada = `${dataParts[0]}-${dataParts[1].padStart(2, '0')}-${dataParts[2].padStart(2, '0')}`;
+
+            const tarefa = {
+                NomeTarefa: nome,
+                Descricao: descricao,
+                DataTarefa: dataFormatada,
+                Prioridade: prioridade,
+                Responsavel: responsavel
+            };
+
+            $.ajax({
+                type: "POST",
+                url: "http://localhost:5144/api/Tarefas/Salvar",
+                contentType: "application/json",
+                data: JSON.stringify(tarefa),
+                success: function (response) {
+                    const listItem = `
+                            <li class="list-group-item">
+                                ${nome}
+                                <button class="btn btn-danger float-right" onclick="excluirTarefa(this)">Excluir</button>
+                            </li>
+                        `;
+                    $(".list-group").append(listItem);
+
+                    $("#nomeTarefaModal").val("");
+                    $("#descricaoTarefaModal").val("");
+                    $("#dataTarefaModal").val("");
+                    $("#prioridadeTarefaModal").val("baixa");
+                    $("#responsavelTarefaModal").val("");
+
+                    $("#modalTarefa").modal("hide");
+                    alert("Tarefa salva com sucesso!");
+                },
+                error: function (xhr, status, error) {
+                    console.error("Status: " + xhr.status);
+                    console.error("Resposta: " + xhr.responseText);
+                    alert("Erro ao salvar a tarefa: " + xhr.status + " - " + xhr.responseText);
+                }
+            });
+        }
+    </script>
